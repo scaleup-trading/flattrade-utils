@@ -47,6 +47,10 @@ def start_auth():
     auth_url = f"https://auth.flattrade.in/?app_key={api_key}"
     return render_template_string(HTML_REDIRECT, auth_url=auth_url)
 
+@app.route('/postback', methods=['POST'])
+def postback():
+    return "Hello from scaleup!"
+
 @app.route('/callback')
 def callback():
     request_code = request.args.get("request_code")
