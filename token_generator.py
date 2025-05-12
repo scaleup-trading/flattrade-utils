@@ -21,7 +21,7 @@ HTML_REDIRECT = """
 <title>Login Redirect</title>
 <h2>Step 2: Login to Flattrade</h2>
 <p>Click the link below to open the Flattrade login page. After login, you’ll be redirected back and get your token here.</p>
-<a href="{{ auth_url }}" target="_blank">Open Flattrade Login</a>
+<a href="{{ auth_url }}">Open Flattrade Login</a>
 """
 
 HTML_CALLBACK = """
@@ -30,6 +30,11 @@ HTML_CALLBACK = """
 <h2>Token Response</h2>
 <pre>{{ token_response }}</pre>
 """
+
+STORE = {
+    'api_key': None,
+    'api_secret': None,
+}
 
 @app.route('/')
 def index():
@@ -43,6 +48,8 @@ def start_auth():
     if not all([api_key, api_secret]):
         return "API key and secret required", 400
 
+    STORE['api_key'] = api_key
+    STORE['api_secret'] = api_secret
     # Save values in query and pass to callback later
     auth_url = f"https://auth.flattrade.in/?app_key={api_key}"
     return render_template_string(HTML_REDIRECT, auth_url=auth_url)
@@ -54,8 +61,8 @@ def postback():
 @app.route('/callback')
 def callback():
     request_code = request.args.get("request_code")
-    api_key = request.args.get("api_key")
-    api_secret_base = request.args.get("api_secret")
+    api_key = STORE['api_key']
+    api_secret_base = STORE['api_secret']
 
     if not all([request_code, api_key, api_secret_base]):
         return "Missing parameters", 400
@@ -74,6 +81,9 @@ def callback():
         token_json = response.json()
     except Exception:
         token_json = {"error": "Invalid response"}
+
+    del STORE['api_key']
+    del STORE['api_secret']
 
     return render_template_string(HTML_CALLBACK, token_response=token_json)
 
