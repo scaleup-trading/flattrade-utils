@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template_string
 import hashlib
 import requests
+import os
 
 app = Flask(__name__)
 
@@ -71,4 +72,9 @@ def callback():
         token_json = {"error": "Invalid response"}
 
     return render_template_string(HTML_CALLBACK, token_response=token_json)
+
+
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
