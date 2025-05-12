@@ -60,15 +60,9 @@ def postback():
 
 @app.route('/callback')
 def callback():
-    print("hello there")
-    print(request.args.__dict__)
     request_code = request.args.get("code")
     api_key = STORE['api_key']
     api_secret_base = STORE['api_secret']
-
-    print(request_code)
-    print(api_key)
-    print(api_secret_base)
 
     if not all([request_code, api_key, api_secret_base]):
         return "Missing parameters", 400
